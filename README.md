@@ -20,14 +20,14 @@ List the minikube services:
 ```sh
 minikube service -n openfaas list
 ```
-You should be able to open the gateway web UI, e.g. at http://192.168.99.100:31112
+You should be able to open the OpenFaaS web UI at the `gateway` service endpoint, e.g. at http://192.168.99.100:31112
 
-**Save the gateway host and port for later**:
+**Pro tip:** save this url in the env variable `OPENFAAS_URL`. The `faas-cli` will automatically use this later on.
 ```sh
-export faas_gw_url=http://192.168.99.100:31112
+export OPENFAAS_URL=http://192.168.99.100:31112
 ```
 
-Setup local docker cli to use minikube
+Setup local docker cli to use minikube (so we don't need to push images to a remote repo):
 ```sh
 eval $(minikube docker-env)
 ```
@@ -64,7 +64,7 @@ require 'time'
 class Handler
   def run(req)
     t = Time.now
-    return "Hello Codecademy Demo! It is currently #{t}"
+    return "Hello #{req}! It is currently #{t}"
   end
 end
 ```
@@ -81,12 +81,24 @@ faas-cli deploy -f ./hello-demo.yml
 
 Invoke:
 ```sh
-curl $faas_gw_url/function/hello-demo
+curl $OPENFAAS_URL/function/hello-demo
 ```
-
-## More
 
 List, explore, add, delete functions in the gateway UI:
 ```sh
-open $faas_gw_url
+open $OPENFAAS_URL
+```
+
+### Third-party Functions:
+
+```sh
+faas-cli deploy --image=faasandfurious/qrcode --name=qrcode --fprocess="/usr/bin/qrcode"
+
+curl $OPENFAAS_URL/function/qrcode --data "https://www.codecademy.com/" > qrcode.png
+```
+
+```sh
+faas-cli deploy --image alexellis2/faas-youtubedl --name youtubedl
+
+curl $OPENFAAS_URL/function/youtubedl --data "https://www.youtube.com/watch?v=hn5Hlusj6Nc" > youtube.mov
 ```
