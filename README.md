@@ -5,7 +5,7 @@
 
 ## Setup
 
-### Deploy OpenFaas
+### Deploy OpenFaaS
 
 Install and start a minikube cluster: https://kubernetes.io/docs/setup/minikube/
 
@@ -59,7 +59,7 @@ Edit `./hello-demo.yaml` so the image has a versioned tag, not `:latest`. (This 
     image: hello-demo:1.0.0
 ```
 
-`./hello-demo/hander.rb`, is the meat of the function. Edit it to do whatever you like:
+`./hello-demo/handler.rb`, is the meat of the function. Edit it to do whatever you like:
 ```rb
 require 'time'
 class Handler
@@ -88,7 +88,7 @@ or with the cli:
 echo -n "wasup" | faas-cli invoke hello-demo
 ```
 
-### Third-party functions
+### Check out some functions built by the community
 
 A QR Code generator - deploy by Docker image
 ```sh
