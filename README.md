@@ -1,8 +1,7 @@
 
 # OpenFaaS Demo
 
-[OpenFaaS](https://github.com/openfaas/faas) is a framework for packaging code/binaries/contianers as Serverless Functions for Docker/Kubernetes.
-
+[OpenFaaS](https://github.com/openfaas/faas) is a framework for packaging code/binaries/containers as serverless functions for Docker/Kubernetes.
 
 ## Setup
 
@@ -40,25 +39,27 @@ brew install faas-cli
 
 ## Create, Build, and Deploy Serverless Functions
 
-Create a new function:
+### Create a new function
+
 ```sh
 cd functions
 faas-cli new --lang ruby hello-demo
 ```
 
-Edit `./functions/hello-demo.yaml` with the valid gateway URL, and tag the image with a version, e.g.:
+This creates some new files in the functions directory:
+```
+./hello-demo.yml
+./hello-demo/Gemfile
+./hello-demo/handler.rb
+```
+
+The yaml file configures the faas-cli for building, pushing and deploying the function.
+Edit `./hello-demo.yaml` so the image has a versioned tag, not `:latest`. (This allows kubernetes, with image pull policy = IfNotPresent, to use the local image and we don't have to push to a registry).
 ```yaml
-provider:
-  name: faas
-  gateway: http://192.168.99.100:31112 # <- replace with actual url
-functions:
-  hello-demo:
-    lang: ruby
-    handler: ./hello-demo
     image: hello-demo:1.0.0
 ```
 
-Edit `./functions/hello-demo/handler.rb` to do whatever you like:
+`./hello-demo/hander.rb`, is the meat of the function. Edit it to do whatever you like:
 ```rb
 require 'time'
 class Handler
@@ -69,36 +70,57 @@ class Handler
 end
 ```
 
-Build:
+### Build and Deploy
 ```sh
 faas-cli build -f ./hello-demo.yml
-```
-
-Deploy:
-```sh
 faas-cli deploy -f ./hello-demo.yml
 ```
 
-Invoke:
+### Invoke
+
+
+With curl:
 ```sh
-curl $OPENFAAS_URL/function/hello-demo
+curl $OPENFAAS_URL/function/hello-demo -d "demo guy"
+```
+or with the cli:
+```sh
+echo -n "wasup" | faas-cli invoke hello-demo
 ```
 
-List, explore, add, delete functions in the gateway UI:
-```sh
-open $OPENFAAS_URL
-```
+### Third-party functions
 
-### Third-party Functions:
-
+A QR Code generator - deploy by Docker image
 ```sh
 faas-cli deploy --image=faasandfurious/qrcode --name=qrcode --fprocess="/usr/bin/qrcode"
 
 curl $OPENFAAS_URL/function/qrcode --data "https://www.codecademy.com/" > qrcode.png
 ```
 
+A youtube video downloader - deploy by stack.yml file:
 ```sh
-faas-cli deploy --image alexellis2/faas-youtubedl --name youtubedl
+faas-cli deploy --gateway $OPENFAAS_URL -f https://raw.githubusercontent.com/faas-and-furious/youtube-dl/master/stack.yml
 
 curl $OPENFAAS_URL/function/youtubedl --data "https://www.youtube.com/watch?v=hn5Hlusj6Nc" > youtube.mov
+```
+
+## Cleanup
+
+Remove the functions:
+```sh
+faas-cli rm hello-demo
+faas-cli rm qrcode
+faas-cli rm youtubedl
+```
+
+Delete the FaaS deployment:
+```sh
+kubectl delete -f ./faas-netes/k8s/
+kubectl delete -f ./faas-netes/namespaces.yml
+```
+
+Spin down the cluster:
+
+```sh
+minikube stop
 ```
