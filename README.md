@@ -1,11 +1,10 @@
-
 # OpenFaaS Demo
 
 [OpenFaaS](https://github.com/openfaas/faas) is a framework for packaging code/binaries/containers as serverless functions for Docker/Kubernetes.
 
 ## Setup
 
-### Deploy OpenFaaS
+### Deploy  OpenFaaS
 
 Install and start a minikube cluster: https://kubernetes.io/docs/setup/minikube/
 
@@ -14,35 +13,35 @@ Deploy the OpenFaaS platform (source: https://github.com/openfaas/faas-netes)
 kubectl apply -f ./faas-netes/namespaces.yml
 kubectl apply -f ./faas-netes/k8s/
 ```
-
-List the minikube services:
+You should now be able to open the OpenFaaS web UI, AKA the "gateway" service:
 ```sh
-minikube service -n openfaas list
-```
-You should be able to open the OpenFaaS web UI at the `gateway` service endpoint, e.g. at http://192.168.99.100:31112
-
-**Pro tip:** save this url in the env variable `OPENFAAS_URL`. The `faas-cli` will automatically use this later on.
-```sh
-export OPENFAAS_URL=http://192.168.99.100:31112
+minikube service -n openfaas gateway
 ```
 
-Setup local docker cli to use minikube (so we don't need to push images to a remote repo):
+### Install Tools and Configure Environment
+Install FaaS CLI
+```sh
+brew install faas-cli
+```
+
+Setup local Docker cli to use minikube (so we don't need to push images to a remote repo):
 ```sh
 eval $(minikube docker-env)
 ```
 
-### Install FaaS CLI
-
+ Save the gateway service url in the env variable `OPENFAAS_URL`. The FaaS CLI will automatically use this later for deploying functions.
 ```sh
-brew install faas-cli
+export OPENFAAS_URL="http://$(minikube ip):31112"
 ```
 
 ## Create, Build, and Deploy Serverless Functions
 
 ### Create a new function
 
+Make a new directory somewhere and use the FaaS CLI to generate the function template:
 ```sh
-cd functions
+mkdir /path/to/my-functions
+cd /path/to/my-functions
 faas-cli new --lang ruby hello-demo
 ```
 
@@ -56,16 +55,16 @@ This creates some new files in the functions directory:
 The yaml file configures the faas-cli for building, pushing and deploying the function.
 Edit `./hello-demo.yaml` so the image has a versioned tag, not `:latest`. (This allows kubernetes, with image pull policy = IfNotPresent, to use the local image and we don't have to push to a registry).
 ```yaml
-    image: hello-demo:1.0.0
+    image: hello-demo:0.1.0
 ```
 
-`./hello-demo/handler.rb`, is the meat of the function. Edit it to do whatever you like:
+The handler, `./hello-demo/handler.rb`, is where all the magic happens. Edit it to do whatever you like:
 ```rb
 require 'time'
 class Handler
   def run(req)
     t = Time.now
-    return "Hello #{req}! It is currently #{t}"
+    return "Hello Demo! It is currently #{t}. Your input is:\n\t#{req}"
   end
 end
 ```
@@ -77,7 +76,6 @@ faas-cli deploy -f ./hello-demo.yml
 ```
 
 ### Invoke
-
 
 With curl:
 ```sh
