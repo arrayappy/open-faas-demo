@@ -117,8 +117,12 @@ kubectl delete -f ./faas-netes/k8s/
 kubectl delete -f ./faas-netes/namespaces.yml
 ```
 
-Spin down the cluster:
-
+Spin down the kubernetes cluster:
 ```sh
 minikube stop
+```
+
+Unset the Docker environment:
+```sh
+eval $(docker-machine env -u)
 ```
