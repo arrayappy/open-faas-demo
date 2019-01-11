@@ -39,7 +39,7 @@ Install FaaS CLI
 brew install faas-cli
 ```
 
-Setup local Docker cli to use minikube (so we don't need to push images to a remote repo):
+Setup local Docker cli to use minikube (this makes the Docker images we ultimately build available within minikube, thus no need to push to a remote registry like Docker Hub):
 ```sh
 eval $(minikube docker-env)
 ```
