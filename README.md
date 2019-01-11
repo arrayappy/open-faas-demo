@@ -1,6 +1,21 @@
 # OpenFaaS Demo
 
-[OpenFaaS](https://github.com/openfaas/faas) is a framework for packaging code/binaries/containers as serverless functions for Docker/Kubernetes.
+> OpenFaaS® (Functions as a Service) is a framework for building Serverless functions with Docker and Kubernetes
+
+Official Resources:
+- https://www.openfaas.com/
+- https://github.com/openfaas/faas
+
+### Serverless
+
+**Serverless** describes a cloud computing model in which all aspects of server management (provisioning, scaling, maintenance, etc) is managed by the cloud provider, abstracted and hidden from the developer.
+
+**FaaS - Functions as a Service** is a specific category of serverless computing. FaaS platforms support the deployment of discrete functions, units of code which handle a piece of business logic
+
+**Examples (other than OpenFaaS):**
+- [AWS Lambda](https://aws.amazon.com/lambda/)
+- [Google Cloud Functions](https://cloud.google.com/functions/)
+- [Azure Functions](https://docs.microsoft.com/en-us/azure/azure-functions/)
 
 ## Setup
 
@@ -8,7 +23,7 @@
 
 Install and start a minikube cluster: https://kubernetes.io/docs/setup/minikube/
 
-Deploy the OpenFaaS platform (source: https://github.com/openfaas/faas-netes)
+Deploy the OpenFaaS platform:
 ```sh
 kubectl apply -f ./faas-netes/namespaces.yml
 kubectl apply -f ./faas-netes/k8s/
