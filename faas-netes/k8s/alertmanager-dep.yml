@@ -1,10 +1,15 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: alertmanager
   namespace: openfaas
+  labels:
+    app: alertmanager
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager
   template:
     metadata:
       labels:
